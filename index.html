@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Розпізнавач Хватової</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+  }
+  h1 {
+    font-size: 1.8rem;
+    color: #2d3748;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    padding: 28px;
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 1rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 18px;
+  }
+  .feature-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .feature-row:last-child { border-bottom: none; }
+  .feature-label {
+    font-size: 0.97rem;
+    color: #2d3748;
+    flex: 1;
+  }
+  .toggle-group {
+    display: flex;
+    gap: 6px;
+  }
+  .toggle-group label {
+    cursor: pointer;
+  }
+  .toggle-group input[type=radio] { display: none; }
+  .toggle-btn {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 2px solid #cbd5e0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #718096;
+    background: #f7fafc;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .toggle-group input[type=radio]:checked + .toggle-btn.yes {
+    background: #48bb78;
+    border-color: #48bb78;
+    color: #fff;
+  }
+  .toggle-group input[type=radio]:checked + .toggle-btn.no {
+    background: #fc8181;
+    border-color: #fc8181;
+    color: #fff;
+  }
+  /* Result */
+  .result-card {
+    text-align: center;
+    padding: 32px 28px;
+  }
+  .result-label {
+    font-size: 0.85rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+  .result-name {
+    font-size: 2.6rem;
+    font-weight: 800;
+    transition: color 0.2s;
+  }
+  .result-name.positive { color: #276749; }
+  .result-name.negative { color: #c53030; }
+  .result-s {
+    margin-top: 8px;
+    font-size: 1.1rem;
+    color: #4a5568;
+  }
+  /* Calculation table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th {
+    text-align: center;
+    padding: 6px 8px;
+    color: #718096;
+    border-bottom: 2px solid #e2e8f0;
+    font-weight: 600;
+  }
+  th:first-child { text-align: left; }
+  td {
+    text-align: center;
+    padding: 7px 8px;
+    border-bottom: 1px solid #f0f4f8;
+    color: #2d3748;
+  }
+  td:first-child { text-align: left; color: #4a5568; }
+  tr.total-row td {
+    border-top: 2px solid #e2e8f0;
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .val-pos { color: #276749; font-weight: 600; }
+  .val-neg { color: #c53030; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Розпізнавач Хватової</h1>
+
+<div class="card">
+  <h2>Ознаки</h2>
+  <div id="features"></div>
+</div>
+
+<div class="card result-card">
+  <div class="result-label">Результат розпізнавання</div>
+  <div class="result-name" id="result-name">—</div>
+  <div class="result-s" id="result-s"></div>
+</div>
+
+<div class="card">
+  <h2>Деталі розрахунку</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Ознака</th>
+        <th>xᵢ</th>
+        <th>wᵢ</th>
+        <th>wᵢ·xᵢ</th>
+      </tr>
+    </thead>
+    <tbody id="calc-body"></tbody>
+  </table>
+</div>
+
+<script>
+const features = [
+  { name: 'Білий фон',           varName: 'x1', w: -1 },
+  { name: 'Жовта кофта',         varName: 'x2', w:  1 },
+  { name: 'Дуже світле волосся', varName: 'x3', w:  1 },
+  { name: 'Окуляри',             varName: 'x4', w:  5 },
+  { name: 'Коротке волосся',     varName: 'x5', w: -3 },
+];
+const W6 = -3; // bias weight (w6·1)
+
+// Build feature toggle rows
+const featuresEl = document.getElementById('features');
+features.forEach((f, i) => {
+  const row = document.createElement('div');
+  row.className = 'feature-row';
+  row.innerHTML = `
+    <span class="feature-label">${f.name}</span>
+    <div class="toggle-group">
+      <label>
+        <input type="radio" name="f${i}" value="1">
+        <span class="toggle-btn yes">Так</span>
+      </label>
+      <label>
+        <input type="radio" name="f${i}" value="-1" checked>
+        <span class="toggle-btn no">Ні</span>
+      </label>
+    </div>`;
+  featuresEl.appendChild(row);
+});
+
+function getValues() {
+  return features.map((_, i) => {
+    const checked = document.querySelector(`input[name="f${i}"]:checked`);
+    return checked ? parseInt(checked.value) : -1;
+  });
+}
+
+function fmt(n) {
+  if (n > 0) return `<span class="val-pos">+${n}</span>`;
+  if (n < 0) return `<span class="val-neg">${n}</span>`;
+  return `<span>0</span>`;
+}
+
+function update() {
+  const xs = getValues();
+  const products = xs.map((x, i) => features[i].w * x);
+  const sumFeatures = products.reduce((a, b) => a + b, 0);
+  const S = sumFeatures + W6;
+
+  // Result
+  const resultEl = document.getElementById('result-name');
+  const resultS  = document.getElementById('result-s');
+  if (S > 0) {
+    resultEl.textContent = 'Хватова';
+    resultEl.className = 'result-name positive';
+  } else {
+    resultEl.textContent = 'Не Хватова';
+    resultEl.className = 'result-name negative';
+  }
+  resultS.innerHTML = `S = ${S > 0 ? '+' : ''}${S}`;
+
+  // Calculation table
+  const tbody = document.getElementById('calc-body');
+  let rows = features.map((f, i) => `
+    <tr>
+      <td>${f.name} (${f.varName})</td>
+      <td>${fmt(xs[i])}</td>
+      <td>${fmt(f.w)}</td>
+      <td>${fmt(products[i])}</td>
+    </tr>`).join('');
+  // Bias row
+  rows += `
+    <tr>
+      <td>Зміщення (w₆·1)</td>
+      <td>${fmt(1)}</td>
+      <td>${fmt(W6)}</td>
+      <td>${fmt(W6)}</td>
+    </tr>`;
+  // Total
+  rows += `
+    <tr class="total-row">
+      <td colspan="3">S = Σ wᵢ·xᵢ + w₆</td>
+      <td>${fmt(S)}</td>
+    </tr>`;
+  tbody.innerHTML = rows;
+}
+
+// Listen for changes
+document.getElementById('features').addEventListener('change', update);
+
+// Initial render
+update();
+</script>
+</body>
+</html>
