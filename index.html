@@ -1,777 +1,105 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Розпізнавач Хватової</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f0f4f8;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px 16px;
-  }
-  h1 {
-    font-size: 1.8rem;
-    color: #2d3748;
-    margin-bottom: 28px;
-    text-align: center;
-  }
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    padding: 28px;
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 20px;
-  }
-  .card h2 {
-    font-size: 1rem;
-    color: #718096;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 18px;
-  }
-  /* Features */
-  .feature-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  .feature-row:last-child { border-bottom: none; }
-  .feature-label {
-    font-size: 0.97rem;
-    color: #2d3748;
-    flex: 1;
-  }
-  .toggle-group { display: flex; gap: 6px; }
-  .toggle-group label { cursor: pointer; }
-  .toggle-group input[type=radio] { display: none; }
-  .toggle-btn {
-    display: inline-block;
-    padding: 5px 14px;
-    border-radius: 20px;
-    border: 2px solid #cbd5e0;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #718096;
-    background: #f7fafc;
-    transition: all 0.15s;
-    user-select: none;
-  }
-  .toggle-group input[type=radio]:checked + .toggle-btn.yes {
-    background: #48bb78; border-color: #48bb78; color: #fff;
-  }
-  .toggle-group input[type=radio]:checked + .toggle-btn.no {
-    background: #fc8181; border-color: #fc8181; color: #fff;
-  }
-  /* Comparison row */
-  .comparison-row {
-    display: flex;
-    gap: 24px;
-  }
-  .comparison-col {
-    flex: 1;
-    text-align: center;
-    padding: 20px 16px;
-    border-radius: 10px;
-    background: #f7fafc;
-  }
-  .result-label {
-    font-size: 0.85rem;
-    color: #718096;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 10px;
-  }
-  .result-name {
-    font-size: 2.2rem;
-    font-weight: 800;
-    transition: color 0.2s;
-  }
-  .result-name.positive { color: #276749; }
-  .result-name.negative { color: #c53030; }
-  .result-s {
-    margin-top: 8px;
-    font-size: 1rem;
-    color: #4a5568;
-  }
-  /* SVG */
-  .svg-container { text-align: center; }
-  .svg-container svg { width: 100%; max-width: 660px; height: auto; }
-  .conn-pos { stroke: #38a169; }
-  .conn-neg { stroke: #e53e3e; }
-  .node-pos { fill: #c6f6d5; stroke: #276749; stroke-width: 2; }
-  .node-neg { fill: #fed7d7; stroke: #c53030; stroke-width: 2; }
-  .node-bias { fill: #e2e8f0; stroke: #718096; stroke-width: 2; }
-  /* Tables */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-  }
-  th {
-    text-align: center;
-    padding: 6px 8px;
-    color: #718096;
-    border-bottom: 2px solid #e2e8f0;
-    font-weight: 600;
-  }
-  th:first-child { text-align: left; }
-  td {
-    text-align: center;
-    padding: 7px 8px;
-    border-bottom: 1px solid #f0f4f8;
-    color: #2d3748;
-  }
-  td:first-child { text-align: left; color: #4a5568; }
-  tr.total-row td {
-    border-top: 2px solid #e2e8f0;
-    border-bottom: none;
-    font-weight: 700;
-    font-size: 0.95rem;
-  }
-  .val-pos { color: #276749; font-weight: 600; }
-  .val-neg { color: #c53030; font-weight: 600; }
-  .layer-heading {
-    font-size: 0.95rem;
-    color: #4a5568;
-    font-weight: 600;
-    margin: 18px 0 8px 0;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  .layer-heading:first-child { margin-top: 0; }
-  .cell-correct { background: #c6f6d5; color: #276749; font-weight: 600; }
-  .cell-wrong { background: #fed7d7; color: #c53030; font-weight: 600; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Нейронні мережі: демонстрація</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #2d3748;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .nav-bar {
+      display: flex; gap: 8px; margin-bottom: 28px; background: #fff;
+      border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 12px 20px; width: 100%; max-width: 900px;
+    }
+    .nav-link {
+      text-decoration: none; padding: 6px 16px; border-radius: 20px;
+      font-size: 0.9rem; font-weight: 600; color: #718096;
+      border: 2px solid transparent; transition: all 0.15s;
+    }
+    .nav-link:hover { background: #f0f4f8; color: #2d3748; }
+    .nav-link.active { background: #48bb78; border-color: #48bb78; color: #fff; }
+    .card-grid {
+      display: flex;
+      gap: 24px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .project-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .project-card h2 {
+      font-size: 1.2rem;
+      color: #2d3748;
+      font-weight: 700;
+    }
+    .project-card p {
+      font-size: 0.95rem;
+      color: #4a5568;
+      line-height: 1.6;
+      flex: 1;
+    }
+    .card-link {
+      display: inline-block;
+      padding: 8px 20px;
+      background: #48bb78;
+      color: #fff;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      align-self: flex-start;
+      transition: background 0.15s;
+    }
+    .card-link:hover { background: #38a169; }
+    @media (max-width: 600px) {
+      .card-grid { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
 
-<h1>Розпізнавач Хватової</h1>
+<nav class="nav-bar">
+  <a href="index.html" class="nav-link active">Головна</a>
+  <a href="khvatova.html" class="nav-link">Розпізнавач Хватової</a>
+  <a href="iris.html" class="nav-link">Класифікатор Ірисів</a>
+</nav>
 
-<!-- 1. Features -->
-<div class="card">
-  <h2>Ознаки</h2>
-  <div id="features"></div>
-</div>
+<h1>Нейронні мережі: демонстрація</h1>
 
-<!-- 2. Comparison results -->
-<div class="card">
-  <h2>Результати розпізнавання</h2>
-  <div class="comparison-row">
-    <div class="comparison-col">
-      <div class="result-label">Персептрон (5&#8594;1)</div>
-      <div class="result-name" id="p-result-name">&mdash;</div>
-      <div class="result-s" id="p-result-s"></div>
-    </div>
-    <div class="comparison-col">
-      <div class="result-label">Мережа Хебба (5&#8594;3&#8594;2&#8594;1)</div>
-      <div class="result-name" id="h-result-name">&mdash;</div>
-      <div class="result-s" id="h-result-s"></div>
-    </div>
+<div class="card-grid">
+  <div class="project-card">
+    <h2>Розпізнавач Хватової</h2>
+    <p>Персептрон (5→1) та мережа Хебба (5→3→2→1) для бінарної класифікації особи за 5 бінарними ознаками.</p>
+    <a href="khvatova.html" class="card-link">Відкрити →</a>
+  </div>
+  <div class="project-card">
+    <h2>Класифікатор Ірисів Фішера</h2>
+    <p>Нейронна мережа TensorFlow.js (4→8→3) для класифікації ірисів за 4 вимірами чашолистка та пелюстки.</p>
+    <a href="iris.html" class="card-link">Відкрити →</a>
   </div>
 </div>
 
-<!-- 3. Perceptron SVG -->
-<div class="card">
-  <h2>Візуалізація: Персептрон (5&#8594;1)</h2>
-  <div class="svg-container" id="perceptron-svg"></div>
-</div>
-
-<!-- 4. Hebb network SVG -->
-<div class="card">
-  <h2>Візуалізація: Мережа Хебба (5&#8594;3&#8594;2&#8594;1)</h2>
-  <div class="svg-container" id="hebb-svg"></div>
-</div>
-
-<!-- 5. Perceptron details -->
-<div class="card">
-  <h2>Деталі: Персептрон</h2>
-  <table>
-    <thead>
-      <tr><th>Ознака</th><th>x&#7522;</th><th>w&#7522;</th><th>w&#7522;&middot;x&#7522;</th></tr>
-    </thead>
-    <tbody id="p-calc-body"></tbody>
-  </table>
-</div>
-
-<!-- 6. Hebb details -->
-<div class="card">
-  <h2>Деталі: Мережа Хебба</h2>
-  <div id="hebb-details"></div>
-</div>
-
-<!-- 7. Training comparison -->
-<div class="card">
-  <h2>Порівняння на навчальній вибірці</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Особа</th>
-        <th>Ознаки</th>
-        <th>Мітка</th>
-        <th>Персептрон</th>
-        <th>Мережа Хебба</th>
-      </tr>
-    </thead>
-    <tbody id="comparison-body"></tbody>
-  </table>
-</div>
-
-<script>
-/* ===== Constants & Training Data ===== */
-var features = [
-  { name: 'Білий фон',           vn: 'x\u2081', w: -1 },
-  { name: 'Жовта кофта',         vn: 'x\u2082', w:  1 },
-  { name: 'Дуже світле волосся', vn: 'x\u2083', w:  1 },
-  { name: 'Окуляри',             vn: 'x\u2084', w:  5 },
-  { name: 'Коротке волосся',     vn: 'x\u2085', w: -3 },
-];
-var BIAS_W = -3;
-
-var DATA = [
-  { name: 'Семеріков',   x: [-1,-1,-1,-1, 1], y: -1 },
-  { name: 'Антоненко',   x: [-1,-1,-1,-1,-1], y: -1 },
-  { name: 'Мінько',      x: [ 1,-1,-1,-1, 1], y: -1 },
-  { name: 'Хватова',     x: [-1,-1,-1, 1,-1], y:  1 },
-  { name: 'Переверзева', x: [-1,-1, 1,-1,-1], y: -1 },
-  { name: 'Кобелєв',     x: [ 1, 1,-1, 1, 1], y: -1 },
-];
-
-/* ===== Deterministic PRNG (mulberry32) ===== */
-function mulberry32(a) {
-  return function() {
-    a |= 0; a = a + 0x6D2B79F5 | 0;
-    var t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-/* ===== Hebb Network (5->3->2->1) ===== */
-function sign(x) { return x > 0 ? 1 : -1; }
-
-function initWeights(rng) {
-  var r = function() { return rng() - 0.5; };
-  return {
-    W1: [0,1,2].map(function() { return [0,1,2,3,4].map(r); }),
-    b1: [0,1,2].map(r),
-    W2: [0,1].map(function() { return [0,1,2].map(r); }),
-    b2: [0,1].map(r),
-    Wo: [0,1].map(r),
-    bo: r()
-  };
-}
-
-function hebbForward(net, x) {
-  var s1 = net.W1.map(function(wj, j) {
-    return wj.reduce(function(s, w, i) { return s + w * x[i]; }, 0) + net.b1[j];
-  });
-  var h1 = s1.map(sign);
-  var s2 = net.W2.map(function(wj, j) {
-    return wj.reduce(function(s, w, i) { return s + w * h1[i]; }, 0) + net.b2[j];
-  });
-  var h2 = s2.map(sign);
-  var so = net.Wo.reduce(function(s, w, i) { return s + w * h2[i]; }, 0) + net.bo;
-  return { h1: h1, h2: h2, output: sign(so), sums: { s1: s1, s2: s2, so: so } };
-}
-
-function trainHebb(seed) {
-  var rng = mulberry32(seed);
-  var net = initWeights(rng);
-  for (var epoch = 0; epoch < 300; epoch++) {
-    var allOk = true;
-    for (var di = 0; di < DATA.length; di++) {
-      var d = DATA[di];
-      var res = hebbForward(net, d.x);
-      if (res.output !== d.y) {
-        allOk = false;
-        var j, i;
-        for (j = 0; j < 3; j++) {
-          for (i = 0; i < 5; i++) net.W1[j][i] += d.x[i] * d.y;
-          net.b1[j] += d.y;
-        }
-        for (j = 0; j < 2; j++) {
-          for (i = 0; i < 3; i++) net.W2[j][i] += res.h1[i] * d.y;
-          net.b2[j] += d.y;
-        }
-        for (i = 0; i < 2; i++) net.Wo[i] += res.h2[i] * d.y;
-        net.bo += d.y;
-      }
-    }
-    if (allOk) break;
-  }
-  return net;
-}
-
-function findGoodSeed() {
-  for (var seed = 1; seed <= 10000; seed++) {
-    var net = trainHebb(seed);
-    var ok = true;
-    for (var i = 0; i < DATA.length; i++) {
-      if (hebbForward(net, DATA[i].x).output !== DATA[i].y) { ok = false; break; }
-    }
-    if (ok) return { net: net, seed: seed };
-  }
-  return { net: trainHebb(1), seed: 1 };
-}
-
-var trained = findGoodSeed();
-var hebbNet = trained.net;
-
-/* ===== Build Feature Toggles ===== */
-var featuresEl = document.getElementById('features');
-features.forEach(function(f, i) {
-  var row = document.createElement('div');
-  row.className = 'feature-row';
-  var label = document.createElement('span');
-  label.className = 'feature-label';
-  label.textContent = f.name;
-  row.appendChild(label);
-
-  var group = document.createElement('div');
-  group.className = 'toggle-group';
-
-  var lYes = document.createElement('label');
-  var rYes = document.createElement('input');
-  rYes.type = 'radio'; rYes.name = 'f' + i; rYes.value = '1';
-  var sYes = document.createElement('span');
-  sYes.className = 'toggle-btn yes'; sYes.textContent = 'Так';
-  lYes.appendChild(rYes); lYes.appendChild(sYes);
-
-  var lNo = document.createElement('label');
-  var rNo = document.createElement('input');
-  rNo.type = 'radio'; rNo.name = 'f' + i; rNo.value = '-1'; rNo.checked = true;
-  var sNo = document.createElement('span');
-  sNo.className = 'toggle-btn no'; sNo.textContent = 'Ні';
-  lNo.appendChild(rNo); lNo.appendChild(sNo);
-
-  group.appendChild(lYes); group.appendChild(lNo);
-  row.appendChild(group);
-  featuresEl.appendChild(row);
-});
-
-/* ===== Helpers ===== */
-function getValues() {
-  return features.map(function(_, i) {
-    var c = document.querySelector('input[name="f' + i + '"]:checked');
-    return c ? parseInt(c.value) : -1;
-  });
-}
-
-function valSpan(n, text) {
-  var span = document.createElement('span');
-  if (n > 0) span.className = 'val-pos';
-  else if (n < 0) span.className = 'val-neg';
-  span.textContent = text;
-  return span;
-}
-
-function fmtInt(n) {
-  return (n > 0 ? '+' : '') + n;
-}
-
-function fmtDec(n) {
-  var s = n.toFixed(1);
-  return (n > 0.001 ? '+' : '') + s;
-}
-
-/* ===== Perceptron Calculation ===== */
-function perceptronCalc(xs) {
-  var prods = xs.map(function(x, i) { return features[i].w * x; });
-  var S = prods.reduce(function(a, b) { return a + b; }, 0) + BIAS_W;
-  return { prods: prods, S: S, result: S > 0 ? 1 : -1 };
-}
-
-/* ===== SVG Drawing ===== */
-function createSvg(width, height) {
-  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
-  return svg;
-}
-
-function addLine(svg, x1, y1, x2, y2, w, sw) {
-  var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-  line.setAttribute('class', w >= 0 ? 'conn-pos' : 'conn-neg');
-  line.setAttribute('stroke-width', sw);
-  line.setAttribute('opacity', '0.55');
-  svg.appendChild(line);
-}
-
-function addCircle(svg, cx, cy, r, cls) {
-  var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  c.setAttribute('cx', cx); c.setAttribute('cy', cy);
-  c.setAttribute('r', r); c.setAttribute('class', cls);
-  svg.appendChild(c);
-}
-
-function addText(svg, x, y, text, opts) {
-  opts = opts || {};
-  var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  t.setAttribute('x', x); t.setAttribute('y', y);
-  t.setAttribute('text-anchor', opts.anchor || 'middle');
-  t.setAttribute('font-size', opts.size || 12);
-  t.setAttribute('font-weight', opts.weight || 'normal');
-  t.setAttribute('fill', opts.fill || '#2d3748');
-  t.setAttribute('dominant-baseline', 'central');
-  t.textContent = text;
-  svg.appendChild(t);
-}
-
-function drawPerceptronSVG(xs) {
-  var p = perceptronCalc(xs);
-  var svg = createSvg(540, 300);
-  var inX = 100, outX = 430, outY = 150;
-  var inY = [40, 90, 140, 190, 240];
-  var bX = 265, bY = 280;
-  var i, w, sw, mx, my;
-
-  // Connections input->output
-  for (i = 0; i < 5; i++) {
-    w = features[i].w;
-    sw = Math.max(1, Math.abs(w) * 1.2);
-    addLine(svg, inX, inY[i], outX, outY, w, sw);
-    mx = inX + (outX - inX) * 0.55;
-    my = inY[i] + (outY - inY[i]) * 0.55 - 8;
-    addText(svg, mx, my, fmtInt(w), { size: 10, fill: '#4a5568' });
-  }
-  // Bias connection
-  sw = Math.max(1, Math.abs(BIAS_W) * 1.2);
-  addLine(svg, bX, bY, outX, outY, BIAS_W, sw);
-  addText(svg, (bX + outX) / 2 + 15, (bY + outY) / 2 - 8, fmtInt(BIAS_W), { size: 10, fill: '#4a5568' });
-
-  // Input nodes
-  for (i = 0; i < 5; i++) {
-    addCircle(svg, inX, inY[i], 18, xs[i] > 0 ? 'node-pos' : 'node-neg');
-    addText(svg, inX, inY[i], xs[i] > 0 ? '+1' : '-1', { size: 12, weight: '600' });
-    addText(svg, inX - 24, inY[i], features[i].name, { anchor: 'end', size: 11, fill: '#4a5568' });
-  }
-
-  // Bias node
-  addCircle(svg, bX, bY, 14, 'node-bias');
-  addText(svg, bX, bY, 'bias', { size: 10, weight: '600', fill: '#718096' });
-
-  // Output node
-  addCircle(svg, outX, outY, 22, p.result > 0 ? 'node-pos' : 'node-neg');
-  addText(svg, outX, outY, p.result > 0 ? '+1' : '-1', { size: 13, weight: '700' });
-  addText(svg, outX + 30, outY, p.result > 0 ? 'Хватова' : 'Не Хватова', {
-    anchor: 'start', size: 13, weight: '700', fill: p.result > 0 ? '#276749' : '#c53030'
-  });
-
-  return svg;
-}
-
-function drawHebbSVG(xs) {
-  var res = hebbForward(hebbNet, xs);
-  var svg = createSvg(660, 310);
-  var lx = [80, 240, 400, 560];
-  var sizes = [5, 3, 2, 1];
-  var layerNames = ['Входи', 'Прихований 1', 'Прихований 2', 'Вихід'];
-  var activations = [xs, res.h1, res.h2, [res.output]];
-
-  function yPositions(n) {
-    var center = 170, gap = 55;
-    if (n === 1) return [center];
-    var span = (n - 1) * gap;
-    var start = center - span / 2;
-    var arr = [];
-    for (var k = 0; k < n; k++) arr.push(start + k * gap);
-    return arr;
-  }
-  var ys = sizes.map(yPositions);
-  var l, i, j, w, sw;
-
-  // Layer labels
-  for (l = 0; l < 4; l++) {
-    addText(svg, lx[l], 18, layerNames[l], { size: 12, weight: '600', fill: '#718096' });
-  }
-
-  // Connections: layer 0->1 (W1)
-  for (j = 0; j < 3; j++) {
-    for (i = 0; i < 5; i++) {
-      w = hebbNet.W1[j][i];
-      sw = Math.max(0.5, Math.min(4, Math.abs(w) * 0.4));
-      addLine(svg, lx[0], ys[0][i], lx[1], ys[1][j], w, sw);
-    }
-  }
-  // Connections: layer 1->2 (W2)
-  for (j = 0; j < 2; j++) {
-    for (i = 0; i < 3; i++) {
-      w = hebbNet.W2[j][i];
-      sw = Math.max(0.5, Math.min(4, Math.abs(w) * 0.4));
-      addLine(svg, lx[1], ys[1][i], lx[2], ys[2][j], w, sw);
-    }
-  }
-  // Connections: layer 2->3 (Wo)
-  for (i = 0; i < 2; i++) {
-    w = hebbNet.Wo[i];
-    sw = Math.max(0.5, Math.min(4, Math.abs(w) * 0.4));
-    addLine(svg, lx[2], ys[2][i], lx[3], ys[3][0], w, sw);
-  }
-
-  // Nodes
-  for (l = 0; l < 4; l++) {
-    for (i = 0; i < sizes[l]; i++) {
-      var a = activations[l][i];
-      var r = l === 3 ? 22 : 18;
-      addCircle(svg, lx[l], ys[l][i], r, a > 0 ? 'node-pos' : 'node-neg');
-      addText(svg, lx[l], ys[l][i], a > 0 ? '+1' : '-1', { size: 12, weight: '600' });
-    }
-  }
-
-  // Feature names left of input layer
-  for (i = 0; i < 5; i++) {
-    addText(svg, lx[0] - 24, ys[0][i], features[i].name, { anchor: 'end', size: 11, fill: '#4a5568' });
-  }
-
-  // Output label
-  addText(svg, lx[3] + 28, ys[3][0], res.output > 0 ? 'Хватова' : 'Не Хватова', {
-    anchor: 'start', size: 13, weight: '700', fill: res.output > 0 ? '#276749' : '#c53030'
-  });
-
-  return svg;
-}
-
-/* ===== Table Builders (DOM-based) ===== */
-function makeCell(tag, text, cls) {
-  var el = document.createElement(tag);
-  if (cls) el.className = cls;
-  el.textContent = text;
-  return el;
-}
-
-function makeValCell(tag, n, text) {
-  var el = document.createElement(tag);
-  var span = document.createElement('span');
-  if (n > 0.001) span.className = 'val-pos';
-  else if (n < -0.001) span.className = 'val-neg';
-  span.textContent = text;
-  el.appendChild(span);
-  return el;
-}
-
-function buildPerceptronTable(xs, p) {
-  var tbody = document.getElementById('p-calc-body');
-  tbody.textContent = '';
-  var i, tr;
-
-  for (i = 0; i < 5; i++) {
-    tr = document.createElement('tr');
-    tr.appendChild(makeCell('td', features[i].name + ' (' + features[i].vn + ')'));
-    tr.appendChild(makeValCell('td', xs[i], fmtInt(xs[i])));
-    tr.appendChild(makeValCell('td', features[i].w, fmtInt(features[i].w)));
-    tr.appendChild(makeValCell('td', p.prods[i], fmtInt(p.prods[i])));
-    tbody.appendChild(tr);
-  }
-  // Bias row
-  tr = document.createElement('tr');
-  tr.appendChild(makeCell('td', 'Зміщення (w\u2086\u00b71)'));
-  tr.appendChild(makeValCell('td', 1, '+1'));
-  tr.appendChild(makeValCell('td', BIAS_W, fmtInt(BIAS_W)));
-  tr.appendChild(makeValCell('td', BIAS_W, fmtInt(BIAS_W)));
-  tbody.appendChild(tr);
-  // Total
-  tr = document.createElement('tr');
-  tr.className = 'total-row';
-  var tdLabel = document.createElement('td');
-  tdLabel.setAttribute('colspan', '3');
-  tdLabel.textContent = 'S = \u03A3 w\u1d62\u00b7x\u1d62 + w\u2086';
-  tr.appendChild(tdLabel);
-  tr.appendChild(makeValCell('td', p.S, fmtInt(p.S)));
-  tbody.appendChild(tr);
-}
-
-function buildHebbDetails(xs, h) {
-  var container = document.getElementById('hebb-details');
-  container.textContent = '';
-  var j, i, tr, table, thead, tbody, hRow;
-
-  // Layer 1: Inputs -> Hidden 1
-  var h1 = document.createElement('div');
-  h1.className = 'layer-heading';
-  h1.textContent = 'Шар 1: Входи \u2192 Прихований 1 (3 нейрони)';
-  container.appendChild(h1);
-
-  table = document.createElement('table');
-  thead = document.createElement('thead');
-  hRow = document.createElement('tr');
-  hRow.appendChild(makeCell('th', 'Вхід'));
-  for (j = 0; j < 3; j++) hRow.appendChild(makeCell('th', 'n\u2081' + (j+1)));
-  thead.appendChild(hRow);
-  table.appendChild(thead);
-
-  tbody = document.createElement('tbody');
-  for (i = 0; i < 5; i++) {
-    tr = document.createElement('tr');
-    tr.appendChild(makeCell('td', features[i].name + ' (' + features[i].vn + '=' + (xs[i]>0?'+1':'-1') + ')'));
-    for (j = 0; j < 3; j++) {
-      var prod = hebbNet.W1[j][i] * xs[i];
-      tr.appendChild(makeValCell('td', prod, fmtDec(prod)));
-    }
-    tbody.appendChild(tr);
-  }
-  // Bias
-  tr = document.createElement('tr');
-  tr.appendChild(makeCell('td', 'Зміщення (bias)'));
-  for (j = 0; j < 3; j++) tr.appendChild(makeValCell('td', hebbNet.b1[j], fmtDec(hebbNet.b1[j])));
-  tbody.appendChild(tr);
-  // Sum
-  tr = document.createElement('tr'); tr.className = 'total-row';
-  tr.appendChild(makeCell('td', '\u03A3'));
-  for (j = 0; j < 3; j++) tr.appendChild(makeValCell('td', h.sums.s1[j], fmtDec(h.sums.s1[j])));
-  tbody.appendChild(tr);
-  // Activation
-  tr = document.createElement('tr'); tr.className = 'total-row';
-  tr.appendChild(makeCell('td', 'sign(\u03A3)'));
-  for (j = 0; j < 3; j++) tr.appendChild(makeValCell('td', h.h1[j], fmtInt(h.h1[j])));
-  tbody.appendChild(tr);
-  table.appendChild(tbody);
-  container.appendChild(table);
-
-  // Layer 2: Hidden 1 -> Hidden 2
-  var h2 = document.createElement('div');
-  h2.className = 'layer-heading';
-  h2.textContent = 'Шар 2: Прихований 1 \u2192 Прихований 2 (2 нейрони)';
-  container.appendChild(h2);
-
-  table = document.createElement('table');
-  thead = document.createElement('thead');
-  hRow = document.createElement('tr');
-  hRow.appendChild(makeCell('th', 'Вхід'));
-  for (j = 0; j < 2; j++) hRow.appendChild(makeCell('th', 'n\u2082' + (j+1)));
-  thead.appendChild(hRow);
-  table.appendChild(thead);
-
-  tbody = document.createElement('tbody');
-  for (i = 0; i < 3; i++) {
-    tr = document.createElement('tr');
-    tr.appendChild(makeCell('td', 'h\u2081' + (i+1) + ' = ' + (h.h1[i]>0?'+1':'-1')));
-    for (j = 0; j < 2; j++) {
-      var prod = hebbNet.W2[j][i] * h.h1[i];
-      tr.appendChild(makeValCell('td', prod, fmtDec(prod)));
-    }
-    tbody.appendChild(tr);
-  }
-  tr = document.createElement('tr');
-  tr.appendChild(makeCell('td', 'Зміщення (bias)'));
-  for (j = 0; j < 2; j++) tr.appendChild(makeValCell('td', hebbNet.b2[j], fmtDec(hebbNet.b2[j])));
-  tbody.appendChild(tr);
-  tr = document.createElement('tr'); tr.className = 'total-row';
-  tr.appendChild(makeCell('td', '\u03A3'));
-  for (j = 0; j < 2; j++) tr.appendChild(makeValCell('td', h.sums.s2[j], fmtDec(h.sums.s2[j])));
-  tbody.appendChild(tr);
-  tr = document.createElement('tr'); tr.className = 'total-row';
-  tr.appendChild(makeCell('td', 'sign(\u03A3)'));
-  for (j = 0; j < 2; j++) tr.appendChild(makeValCell('td', h.h2[j], fmtInt(h.h2[j])));
-  tbody.appendChild(tr);
-  table.appendChild(tbody);
-  container.appendChild(table);
-
-  // Output layer
-  var h3 = document.createElement('div');
-  h3.className = 'layer-heading';
-  h3.textContent = 'Вихідний шар: Прихований 2 \u2192 Вихід';
-  container.appendChild(h3);
-
-  table = document.createElement('table');
-  thead = document.createElement('thead');
-  hRow = document.createElement('tr');
-  hRow.appendChild(makeCell('th', 'Вхід'));
-  hRow.appendChild(makeCell('th', 'Вихід'));
-  thead.appendChild(hRow);
-  table.appendChild(thead);
-
-  tbody = document.createElement('tbody');
-  for (i = 0; i < 2; i++) {
-    tr = document.createElement('tr');
-    tr.appendChild(makeCell('td', 'h\u2082' + (i+1) + ' = ' + (h.h2[i]>0?'+1':'-1')));
-    var prod = hebbNet.Wo[i] * h.h2[i];
-    tr.appendChild(makeValCell('td', prod, fmtDec(prod)));
-    tbody.appendChild(tr);
-  }
-  tr = document.createElement('tr');
-  tr.appendChild(makeCell('td', 'Зміщення (bias)'));
-  tr.appendChild(makeValCell('td', hebbNet.bo, fmtDec(hebbNet.bo)));
-  tbody.appendChild(tr);
-  tr = document.createElement('tr'); tr.className = 'total-row';
-  tr.appendChild(makeCell('td', '\u03A3'));
-  tr.appendChild(makeValCell('td', h.sums.so, fmtDec(h.sums.so)));
-  tbody.appendChild(tr);
-  tr = document.createElement('tr'); tr.className = 'total-row';
-  tr.appendChild(makeCell('td', 'sign(\u03A3) \u2192 Результат'));
-  tr.appendChild(makeValCell('td', h.output, fmtInt(h.output)));
-  tbody.appendChild(tr);
-  table.appendChild(tbody);
-  container.appendChild(table);
-}
-
-/* ===== Comparison Table (built once) ===== */
-function buildComparisonTable() {
-  var tbody = document.getElementById('comparison-body');
-  tbody.textContent = '';
-  for (var di = 0; di < DATA.length; di++) {
-    var d = DATA[di];
-    var p = perceptronCalc(d.x);
-    var h = hebbForward(hebbNet, d.x);
-    var pOk = p.result === d.y;
-    var hOk = h.output === d.y;
-
-    var tr = document.createElement('tr');
-    tr.appendChild(makeCell('td', d.name));
-    tr.appendChild(makeCell('td', '[' + d.x.map(function(v){return v>0?'+1':'-1';}).join(', ') + ']'));
-    tr.appendChild(makeCell('td', d.y > 0 ? '+1' : '-1'));
-    tr.appendChild(makeCell('td', (p.result>0?'+1':'-1') + (pOk?' \u2713':' \u2717'), pOk ? 'cell-correct' : 'cell-wrong'));
-    tr.appendChild(makeCell('td', (h.output>0?'+1':'-1') + (hOk?' \u2713':' \u2717'), hOk ? 'cell-correct' : 'cell-wrong'));
-    tbody.appendChild(tr);
-  }
-}
-
-/* ===== Update Everything ===== */
-function update() {
-  var xs = getValues();
-
-  // Perceptron result
-  var p = perceptronCalc(xs);
-  var pEl = document.getElementById('p-result-name');
-  pEl.textContent = p.result > 0 ? 'Хватова' : 'Не Хватова';
-  pEl.className = 'result-name ' + (p.result > 0 ? 'positive' : 'negative');
-  document.getElementById('p-result-s').textContent = 'S = ' + fmtInt(p.S);
-
-  // Hebb result
-  var h = hebbForward(hebbNet, xs);
-  var hEl = document.getElementById('h-result-name');
-  hEl.textContent = h.output > 0 ? 'Хватова' : 'Не Хватова';
-  hEl.className = 'result-name ' + (h.output > 0 ? 'positive' : 'negative');
-  document.getElementById('h-result-s').textContent = 'S = ' + fmtDec(h.sums.so);
-
-  // SVGs
-  var pSvgContainer = document.getElementById('perceptron-svg');
-  pSvgContainer.textContent = '';
-  pSvgContainer.appendChild(drawPerceptronSVG(xs));
-
-  var hSvgContainer = document.getElementById('hebb-svg');
-  hSvgContainer.textContent = '';
-  hSvgContainer.appendChild(drawHebbSVG(xs));
-
-  // Detail tables
-  buildPerceptronTable(xs, p);
-  buildHebbDetails(xs, h);
-}
-
-/* ===== Init ===== */
-document.getElementById('features').addEventListener('change', update);
-update();
-buildComparisonTable();
-</script>
 </body>
 </html>

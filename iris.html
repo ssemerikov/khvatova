@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Класифікатор Ірисів Фішера</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #2d3748;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .nav-bar {
+      display: flex; gap: 8px; margin-bottom: 28px; background: #fff;
+      border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 12px 20px; width: 100%; max-width: 900px;
+    }
+    .nav-link {
+      text-decoration: none; padding: 6px 16px; border-radius: 20px;
+      font-size: 0.9rem; font-weight: 600; color: #718096;
+      border: 2px solid transparent; transition: all 0.15s;
+    }
+    .nav-link:hover { background: #f0f4f8; color: #2d3748; }
+    .nav-link.active { background: #48bb78; border-color: #48bb78; color: #fff; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 28px;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 1rem;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 18px;
+    }
+    /* Progress bar */
+    .progress-wrap {
+      background: #e2e8f0;
+      border-radius: 8px;
+      height: 16px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #48bb78, #38a169);
+      border-radius: 8px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    .progress-status {
+      font-size: 0.9rem;
+      color: #4a5568;
+      text-align: center;
+    }
+    /* Sliders */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .slider-row:last-of-type { border-bottom: none; }
+    .slider-label {
+      flex: 0 0 220px;
+      font-size: 0.95rem;
+      color: #2d3748;
+    }
+    .slider-row input[type=range] {
+      flex: 1;
+      accent-color: #48bb78;
+    }
+    .slider-val {
+      flex: 0 0 48px;
+      text-align: right;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #2d3748;
+    }
+    .classify-btn {
+      margin-top: 16px;
+      padding: 10px 28px;
+      background: #48bb78;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .classify-btn:hover { background: #38a169; }
+    /* Result */
+    .result-class {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+    .prob-bars { display: flex; flex-direction: column; gap: 8px; }
+    .prob-row { display: flex; align-items: center; gap: 10px; }
+    .prob-name { flex: 0 0 160px; font-size: 0.9rem; color: #4a5568; }
+    .prob-track {
+      flex: 1; background: #e2e8f0; border-radius: 6px; height: 12px; overflow: hidden;
+    }
+    .prob-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+    .prob-pct { flex: 0 0 48px; text-align: right; font-size: 0.9rem; font-weight: 600; color: #2d3748; }
+    /* SVG */
+    .svg-container { text-align: center; }
+    .svg-container svg { width: 100%; max-width: 700px; height: auto; }
+    .conn-pos { stroke: #38a169; }
+    .conn-neg { stroke: #e53e3e; }
+    .node-hi  { fill: #c6f6d5; stroke: #276749; stroke-width: 2; }
+    .node-mid { fill: #bee3f8; stroke: #2b6cb0; stroke-width: 2; }
+    .node-lo  { fill: #fed7d7; stroke: #c53030; stroke-width: 2; }
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      text-align: center; padding: 6px 6px; color: #718096;
+      border-bottom: 2px solid #e2e8f0; font-weight: 600;
+    }
+    th:first-child { text-align: left; }
+    td {
+      text-align: center; padding: 5px 6px;
+      border-bottom: 1px solid #f0f4f8; color: #2d3748;
+    }
+    td:first-child { text-align: left; color: #4a5568; }
+    .cell-correct { background: #c6f6d5; color: #276749; font-weight: 600; }
+    .cell-wrong   { background: #fed7d7; color: #c53030; font-weight: 600; }
+    .accuracy-summary {
+      font-size: 1.1rem; font-weight: 700; color: #2d3748; margin-bottom: 16px;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<nav class="nav-bar">
+  <a href="index.html" class="nav-link">Головна</a>
+  <a href="khvatova.html" class="nav-link">Розпізнавач Хватової</a>
+  <a href="iris.html" class="nav-link active">Класифікатор Ірисів</a>
+</nav>
+
+<h1>Класифікатор Ірисів Фішера</h1>
+
+<!-- Training card -->
+<div class="card" id="training-card">
+  <h2>Навчання мережі (4&#8594;8&#8594;3)</h2>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <div class="progress-status" id="progress-status">Підготовка...</div>
+</div>
+
+<!-- Classifier card -->
+<div class="card hidden" id="classifier-card">
+  <h2>Класифікатор</h2>
+  <div id="slider-container"></div>
+  <button class="classify-btn" id="classify-btn">Класифікувати</button>
+  <div style="margin-top:20px;" id="result-container">
+    <div class="result-class" id="result-class" style="color:#2d3748;">&mdash;</div>
+    <div class="prob-bars" id="prob-bars"></div>
+  </div>
+</div>
+
+<!-- Network visualization card -->
+<div class="card hidden" id="viz-card">
+  <h2>Візуалізація мережі (4&#8594;8&#8594;3)</h2>
+  <div class="svg-container" id="network-svg"></div>
+</div>
+
+<!-- Accuracy card -->
+<div class="card hidden" id="accuracy-card">
+  <h2>Точність на навчальній вибірці</h2>
+  <div class="accuracy-summary" id="accuracy-summary"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Чашолисток (д)</th>
+        <th>Чашолисток (ш)</th>
+        <th>Пелюстка (д)</th>
+        <th>Пелюстка (ш)</th>
+        <th>Фактичний</th>
+        <th>Передбачений</th>
+      </tr>
+    </thead>
+    <tbody id="accuracy-body"></tbody>
+  </table>
+</div>
+
+<script>
+/* ===== Constants ===== */
+var FEAT_NAMES = [
+  'Чашолисток (довжина, см)',
+  'Чашолисток (ширина, см)',
+  'Пелюстка (довжина, см)',
+  'Пелюстка (ширина, см)'
+];
+var FEAT_MIN = [4.3, 2.0, 1.0, 0.1];
+var FEAT_MAX = [7.9, 4.4, 6.9, 2.5];
+var CLASSES = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'];
+var CLASS_COLORS = ['#48bb78', '#4299e1', '#ed8936'];
+
+/* ===== Iris Dataset (150 samples embedded) ===== */
+var IRIS_DATA = [
+  [5.1,3.5,1.4,0.2,'Iris-setosa'],[4.9,3.0,1.4,0.2,'Iris-setosa'],
+  [4.7,3.2,1.3,0.2,'Iris-setosa'],[4.6,3.1,1.5,0.2,'Iris-setosa'],
+  [5.0,3.6,1.4,0.2,'Iris-setosa'],[5.4,3.9,1.7,0.4,'Iris-setosa'],
+  [4.6,3.4,1.4,0.3,'Iris-setosa'],[5.0,3.4,1.5,0.2,'Iris-setosa'],
+  [4.4,2.9,1.4,0.2,'Iris-setosa'],[4.9,3.1,1.5,0.1,'Iris-setosa'],
+  [5.4,3.7,1.5,0.2,'Iris-setosa'],[4.8,3.4,1.6,0.2,'Iris-setosa'],
+  [4.8,3.0,1.4,0.1,'Iris-setosa'],[4.3,3.0,1.1,0.1,'Iris-setosa'],
+  [5.8,4.0,1.2,0.2,'Iris-setosa'],[5.7,4.4,1.5,0.4,'Iris-setosa'],
+  [5.4,3.9,1.3,0.4,'Iris-setosa'],[5.1,3.5,1.4,0.3,'Iris-setosa'],
+  [5.7,3.8,1.7,0.3,'Iris-setosa'],[5.1,3.8,1.5,0.3,'Iris-setosa'],
+  [5.4,3.4,1.7,0.2,'Iris-setosa'],[5.1,3.7,1.5,0.4,'Iris-setosa'],
+  [4.6,3.6,1.0,0.2,'Iris-setosa'],[5.1,3.3,1.7,0.5,'Iris-setosa'],
+  [4.8,3.4,1.9,0.2,'Iris-setosa'],[5.0,3.0,1.6,0.2,'Iris-setosa'],
+  [5.0,3.4,1.6,0.4,'Iris-setosa'],[5.2,3.5,1.5,0.2,'Iris-setosa'],
+  [5.2,3.4,1.4,0.2,'Iris-setosa'],[4.7,3.2,1.6,0.2,'Iris-setosa'],
+  [4.8,3.1,1.6,0.2,'Iris-setosa'],[5.4,3.4,1.5,0.4,'Iris-setosa'],
+  [5.2,4.1,1.5,0.1,'Iris-setosa'],[5.5,4.2,1.4,0.2,'Iris-setosa'],
+  [4.9,3.1,1.5,0.2,'Iris-setosa'],[5.0,3.2,1.2,0.2,'Iris-setosa'],
+  [5.5,3.5,1.3,0.2,'Iris-setosa'],[4.9,3.6,1.4,0.1,'Iris-setosa'],
+  [4.4,3.0,1.3,0.2,'Iris-setosa'],[5.1,3.4,1.5,0.2,'Iris-setosa'],
+  [5.0,3.5,1.3,0.3,'Iris-setosa'],[4.5,2.3,1.3,0.3,'Iris-setosa'],
+  [4.4,3.2,1.3,0.2,'Iris-setosa'],[5.0,3.5,1.6,0.6,'Iris-setosa'],
+  [5.1,3.8,1.9,0.4,'Iris-setosa'],[4.8,3.0,1.4,0.3,'Iris-setosa'],
+  [5.1,3.8,1.6,0.2,'Iris-setosa'],[4.6,3.2,1.4,0.2,'Iris-setosa'],
+  [5.3,3.7,1.5,0.2,'Iris-setosa'],[5.0,3.3,1.4,0.2,'Iris-setosa'],
+  [7.0,3.2,4.7,1.4,'Iris-versicolor'],[6.4,3.2,4.5,1.5,'Iris-versicolor'],
+  [6.9,3.1,4.9,1.5,'Iris-versicolor'],[5.5,2.3,4.0,1.3,'Iris-versicolor'],
+  [6.5,2.8,4.6,1.5,'Iris-versicolor'],[5.7,2.8,4.5,1.3,'Iris-versicolor'],
+  [6.3,3.3,4.7,1.6,'Iris-versicolor'],[4.9,2.4,3.3,1.0,'Iris-versicolor'],
+  [6.6,2.9,4.6,1.3,'Iris-versicolor'],[5.2,2.7,3.9,1.4,'Iris-versicolor'],
+  [5.0,2.0,3.5,1.0,'Iris-versicolor'],[5.9,3.0,4.2,1.5,'Iris-versicolor'],
+  [6.0,2.2,4.0,1.0,'Iris-versicolor'],[6.1,2.9,4.7,1.4,'Iris-versicolor'],
+  [5.6,2.9,3.6,1.3,'Iris-versicolor'],[6.7,3.1,4.4,1.4,'Iris-versicolor'],
+  [5.6,3.0,4.5,1.5,'Iris-versicolor'],[5.8,2.7,4.1,1.0,'Iris-versicolor'],
+  [6.2,2.2,4.5,1.5,'Iris-versicolor'],[5.6,2.5,3.9,1.1,'Iris-versicolor'],
+  [5.9,3.2,4.8,1.8,'Iris-versicolor'],[6.1,2.8,4.0,1.3,'Iris-versicolor'],
+  [6.3,2.5,4.9,1.5,'Iris-versicolor'],[6.1,2.8,4.7,1.2,'Iris-versicolor'],
+  [6.4,2.9,4.3,1.3,'Iris-versicolor'],[6.6,3.0,4.4,1.4,'Iris-versicolor'],
+  [6.8,2.8,4.8,1.4,'Iris-versicolor'],[6.7,3.0,5.0,1.7,'Iris-versicolor'],
+  [6.0,2.9,4.5,1.5,'Iris-versicolor'],[5.7,2.6,3.5,1.0,'Iris-versicolor'],
+  [5.5,2.4,3.8,1.1,'Iris-versicolor'],[5.5,2.4,3.7,1.0,'Iris-versicolor'],
+  [5.8,2.7,3.9,1.2,'Iris-versicolor'],[6.0,2.7,5.1,1.6,'Iris-versicolor'],
+  [5.4,3.0,4.5,1.5,'Iris-versicolor'],[6.0,3.4,4.5,1.6,'Iris-versicolor'],
+  [6.7,3.1,4.7,1.5,'Iris-versicolor'],[6.3,2.3,4.4,1.3,'Iris-versicolor'],
+  [5.6,3.0,4.1,1.3,'Iris-versicolor'],[5.5,2.5,4.0,1.3,'Iris-versicolor'],
+  [5.5,2.6,4.4,1.2,'Iris-versicolor'],[6.1,3.0,4.6,1.4,'Iris-versicolor'],
+  [5.8,2.6,4.0,1.2,'Iris-versicolor'],[5.0,2.3,3.3,1.0,'Iris-versicolor'],
+  [5.6,2.7,4.2,1.3,'Iris-versicolor'],[5.7,3.0,4.2,1.2,'Iris-versicolor'],
+  [5.7,2.9,4.2,1.3,'Iris-versicolor'],[6.2,2.9,4.3,1.3,'Iris-versicolor'],
+  [5.1,2.5,3.0,1.1,'Iris-versicolor'],[5.7,2.8,4.1,1.3,'Iris-versicolor'],
+  [6.3,3.3,6.0,2.5,'Iris-virginica'],[5.8,2.7,5.1,1.9,'Iris-virginica'],
+  [7.1,3.0,5.9,2.1,'Iris-virginica'],[6.3,2.9,5.6,1.8,'Iris-virginica'],
+  [6.5,3.0,5.8,2.2,'Iris-virginica'],[7.6,3.0,6.6,2.1,'Iris-virginica'],
+  [4.9,2.5,4.5,1.7,'Iris-virginica'],[7.3,2.9,6.3,1.8,'Iris-virginica'],
+  [6.7,2.5,5.8,1.8,'Iris-virginica'],[7.2,3.6,6.1,2.5,'Iris-virginica'],
+  [6.5,3.2,5.1,2.0,'Iris-virginica'],[6.4,2.7,5.3,1.9,'Iris-virginica'],
+  [6.8,3.0,5.5,2.1,'Iris-virginica'],[5.7,2.5,5.0,2.0,'Iris-virginica'],
+  [5.8,2.8,5.1,2.4,'Iris-virginica'],[6.4,3.2,5.3,2.3,'Iris-virginica'],
+  [6.5,3.0,5.5,1.8,'Iris-virginica'],[7.7,3.8,6.7,2.2,'Iris-virginica'],
+  [7.7,2.6,6.9,2.3,'Iris-virginica'],[6.0,2.2,5.0,1.5,'Iris-virginica'],
+  [6.9,3.2,5.7,2.3,'Iris-virginica'],[5.6,2.8,4.9,2.0,'Iris-virginica'],
+  [7.7,2.8,6.7,2.0,'Iris-virginica'],[6.3,2.7,4.9,1.8,'Iris-virginica'],
+  [6.7,3.3,5.7,2.1,'Iris-virginica'],[7.2,3.2,6.0,1.8,'Iris-virginica'],
+  [6.2,2.8,4.8,1.8,'Iris-virginica'],[6.1,3.0,4.9,1.8,'Iris-virginica'],
+  [6.4,2.8,5.6,2.1,'Iris-virginica'],[7.2,3.0,5.8,1.6,'Iris-virginica'],
+  [7.4,2.8,6.1,1.9,'Iris-virginica'],[7.9,3.8,6.4,2.0,'Iris-virginica'],
+  [6.4,2.8,5.6,2.2,'Iris-virginica'],[6.3,2.8,5.1,1.5,'Iris-virginica'],
+  [6.1,2.6,5.6,1.4,'Iris-virginica'],[7.7,3.0,6.1,2.3,'Iris-virginica'],
+  [6.3,3.4,5.6,2.4,'Iris-virginica'],[6.4,3.1,5.5,1.8,'Iris-virginica'],
+  [6.0,3.0,4.8,1.8,'Iris-virginica'],[6.9,3.1,5.4,2.1,'Iris-virginica'],
+  [6.7,3.1,5.6,2.4,'Iris-virginica'],[6.9,3.1,5.1,2.3,'Iris-virginica'],
+  [5.8,2.7,5.1,1.9,'Iris-virginica'],[6.8,3.2,5.9,2.3,'Iris-virginica'],
+  [6.7,3.3,5.7,2.5,'Iris-virginica'],[6.7,3.0,5.2,2.3,'Iris-virginica'],
+  [6.3,2.5,5.0,1.9,'Iris-virginica'],[6.5,3.0,5.2,2.0,'Iris-virginica'],
+  [6.2,3.4,5.4,2.3,'Iris-virginica'],[5.9,3.0,5.1,1.8,'Iris-virginica']
+];
+
+/* ===== Data Preparation ===== */
+function prepareData() {
+  var xs = IRIS_DATA.map(function(row) {
+    return [
+      (row[0] - FEAT_MIN[0]) / (FEAT_MAX[0] - FEAT_MIN[0]),
+      (row[1] - FEAT_MIN[1]) / (FEAT_MAX[1] - FEAT_MIN[1]),
+      (row[2] - FEAT_MIN[2]) / (FEAT_MAX[2] - FEAT_MIN[2]),
+      (row[3] - FEAT_MIN[3]) / (FEAT_MAX[3] - FEAT_MIN[3])
+    ];
+  });
+  var ys = IRIS_DATA.map(function(row) {
+    var idx = CLASSES.indexOf(row[4]);
+    return [idx === 0 ? 1 : 0, idx === 1 ? 1 : 0, idx === 2 ? 1 : 0];
+  });
+  return {
+    xs: tf.tensor2d(xs),
+    ys: tf.tensor2d(ys),
+    raw: xs
+  };
+}
+
+function normalizeInput(vals) {
+  return vals.map(function(v, i) {
+    return (v - FEAT_MIN[i]) / (FEAT_MAX[i] - FEAT_MIN[i]);
+  });
+}
+
+/* ===== Model ===== */
+function buildModel() {
+  var m = tf.sequential();
+  m.add(tf.layers.dense({ inputShape: [4], units: 8, activation: 'relu' }));
+  m.add(tf.layers.dense({ units: 3, activation: 'softmax' }));
+  m.compile({
+    optimizer: tf.train.adam(0.01),
+    loss: 'categoricalCrossentropy',
+    metrics: ['accuracy']
+  });
+  return m;
+}
+
+/* ===== SVG Helpers ===== */
+function createSvg(width, height) {
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+  return svg;
+}
+
+function svgLine(svg, x1, y1, x2, y2, color, sw) {
+  var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', color);
+  line.setAttribute('stroke-width', sw);
+  line.setAttribute('opacity', '0.35');
+  svg.appendChild(line);
+}
+
+function svgCircle(svg, cx, cy, r, cls) {
+  var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c.setAttribute('cx', cx); c.setAttribute('cy', cy);
+  c.setAttribute('r', r); c.setAttribute('class', cls);
+  svg.appendChild(c);
+}
+
+function svgText(svg, x, y, text, opts) {
+  opts = opts || {};
+  var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  t.setAttribute('text-anchor', opts.anchor || 'middle');
+  t.setAttribute('font-size', opts.size || 11);
+  t.setAttribute('font-weight', opts.weight || 'normal');
+  t.setAttribute('fill', opts.fill || '#2d3748');
+  t.setAttribute('dominant-baseline', 'central');
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+function nodeClass(act) {
+  if (act > 0.6) return 'node-hi';
+  if (act > 0.3) return 'node-mid';
+  return 'node-lo';
+}
+
+function drawNetworkSVG(hiddenActs, outputActs) {
+  var W = 700, H = 380;
+  var svg = createSvg(W, H);
+
+  var lx = [70, 250, 430, 620];
+  var layerSizes = [4, 8, 3, 3];  // input, hidden, output-raw, output-named
+  var layerNames = ['Вхід', 'Прихований (relu)', 'Вихід (softmax)', ''];
+
+  function yPos(n, idx) {
+    var center = H / 2, gap = Math.min(42, (H - 60) / Math.max(n - 1, 1));
+    if (n === 1) return [center];
+    var span = (n - 1) * gap;
+    var start = center - span / 2;
+    var arr = [];
+    for (var k = 0; k < n; k++) arr.push(start + k * gap);
+    return arr;
+  }
+
+  var inputY = yPos(4, 0);
+  var hiddenY = yPos(8, 1);
+  var outputY = yPos(3, 2);
+
+  // Layer labels
+  for (var l = 0; l < 3; l++) {
+    svgText(svg, lx[l], 18, layerNames[l], { size: 11, weight: '600', fill: '#718096' });
+  }
+
+  // Connections input->hidden (simplified: just draw all, uniform)
+  var i, j;
+  for (j = 0; j < 8; j++) {
+    for (i = 0; i < 4; i++) {
+      svgLine(svg, lx[0], inputY[i], lx[1], hiddenY[j], '#718096', 0.7);
+    }
+  }
+  // Connections hidden->output
+  for (j = 0; j < 3; j++) {
+    for (i = 0; i < 8; i++) {
+      svgLine(svg, lx[1], hiddenY[i], lx[2], outputY[j], '#718096', 0.7);
+    }
+  }
+
+  // Input nodes (current slider values normalized)
+  var sliderVals = getSliderValues();
+  var normVals = normalizeInput(sliderVals);
+  for (i = 0; i < 4; i++) {
+    svgCircle(svg, lx[0], inputY[i], 16, nodeClass(normVals[i]));
+    svgText(svg, lx[0], inputY[i], normVals[i].toFixed(2), { size: 9, weight: '600' });
+    svgText(svg, lx[0] - 20, inputY[i], ['Чш.Д','Чш.Ш','Пл.Д','Пл.Ш'][i], {
+      anchor: 'end', size: 10, fill: '#4a5568'
+    });
+  }
+
+  // Hidden nodes
+  for (i = 0; i < 8; i++) {
+    var ha = hiddenActs ? hiddenActs[i] : 0;
+    svgCircle(svg, lx[1], hiddenY[i], 14, nodeClass(ha));
+    svgText(svg, lx[1], hiddenY[i], ha.toFixed(2), { size: 9, weight: '600' });
+  }
+
+  // Output nodes
+  for (i = 0; i < 3; i++) {
+    var oa = outputActs ? outputActs[i] : 0;
+    svgCircle(svg, lx[2], outputY[i], 18, nodeClass(oa));
+    svgText(svg, lx[2], outputY[i], (oa * 100).toFixed(0) + '%', { size: 9, weight: '700' });
+    svgText(svg, lx[2] + 24, outputY[i], CLASSES[i], {
+      anchor: 'start', size: 10, fill: CLASS_COLORS[i], weight: '600'
+    });
+  }
+
+  var container = document.getElementById('network-svg');
+  container.textContent = '';
+  container.appendChild(svg);
+}
+
+/* ===== Sliders ===== */
+function buildSliders() {
+  var container = document.getElementById('slider-container');
+  container.textContent = '';
+  FEAT_NAMES.forEach(function(name, i) {
+    var row = document.createElement('div');
+    row.className = 'slider-row';
+
+    var label = document.createElement('span');
+    label.className = 'slider-label';
+    label.textContent = name;
+
+    var slider = document.createElement('input');
+    slider.type = 'range';
+    slider.id = 'sl' + i;
+    slider.min = FEAT_MIN[i];
+    slider.max = FEAT_MAX[i];
+    slider.step = 0.1;
+    // Default: midpoint
+    slider.value = ((FEAT_MIN[i] + FEAT_MAX[i]) / 2).toFixed(1);
+
+    var valEl = document.createElement('span');
+    valEl.className = 'slider-val';
+    valEl.id = 'slv' + i;
+    valEl.textContent = slider.value;
+
+    slider.addEventListener('input', function(idx, vel) {
+      return function() { vel.textContent = this.value; };
+    }(i, valEl));
+
+    row.appendChild(label);
+    row.appendChild(slider);
+    row.appendChild(valEl);
+    container.appendChild(row);
+  });
+}
+
+function getSliderValues() {
+  return FEAT_NAMES.map(function(_, i) {
+    var el = document.getElementById('sl' + i);
+    return el ? parseFloat(el.value) : (FEAT_MIN[i] + FEAT_MAX[i]) / 2;
+  });
+}
+
+/* ===== Result Rendering ===== */
+function renderResult(probs, model) {
+  var maxIdx = 0;
+  probs.forEach(function(p, i) { if (p > probs[maxIdx]) maxIdx = i; });
+
+  var resultClass = document.getElementById('result-class');
+  resultClass.textContent = CLASSES[maxIdx];
+  resultClass.style.color = CLASS_COLORS[maxIdx];
+
+  var probBars = document.getElementById('prob-bars');
+  probBars.textContent = '';
+  probs.forEach(function(p, i) {
+    var row = document.createElement('div');
+    row.className = 'prob-row';
+
+    var name = document.createElement('span');
+    name.className = 'prob-name';
+    name.textContent = CLASSES[i];
+
+    var track = document.createElement('div');
+    track.className = 'prob-track';
+    var fill = document.createElement('div');
+    fill.className = 'prob-fill';
+    fill.style.width = (p * 100).toFixed(1) + '%';
+    fill.style.background = CLASS_COLORS[i];
+    track.appendChild(fill);
+
+    var pct = document.createElement('span');
+    pct.className = 'prob-pct';
+    pct.textContent = (p * 100).toFixed(1) + '%';
+
+    row.appendChild(name);
+    row.appendChild(track);
+    row.appendChild(pct);
+    probBars.appendChild(row);
+  });
+}
+
+/* ===== Classify ===== */
+function classify(model) {
+  var vals = getSliderValues();
+  var norm = normalizeInput(vals);
+
+  tf.tidy(function() {
+    var input = tf.tensor2d([norm]);
+    var vizModel = tf.model({
+      inputs: model.inputs,
+      outputs: [model.layers[0].output, model.layers[1].output]
+    });
+    var results = vizModel.predict(input);
+    var hiddenArr = Array.from(results[0].dataSync());
+    var outputArr = Array.from(results[1].dataSync());
+
+    renderResult(outputArr, model);
+    drawNetworkSVG(hiddenArr, outputArr);
+  });
+}
+
+/* ===== Accuracy Table ===== */
+function buildAccuracyTable(model, data) {
+  var predictions = tf.tidy(function() {
+    return model.predict(data.xs);
+  });
+  var predArray = predictions.arraySync();
+  predictions.dispose();
+
+  var correct = 0;
+  var tbody = document.getElementById('accuracy-body');
+  tbody.textContent = '';
+
+  IRIS_DATA.forEach(function(row, idx) {
+    var probs = predArray[idx];
+    var predIdx = 0;
+    probs.forEach(function(p, i) { if (p > probs[predIdx]) predIdx = i; });
+    var actualIdx = CLASSES.indexOf(row[4]);
+    var ok = predIdx === actualIdx;
+    if (ok) correct++;
+
+    var tr = document.createElement('tr');
+    var td0 = document.createElement('td'); td0.textContent = idx + 1; tr.appendChild(td0);
+    for (var fi = 0; fi < 4; fi++) {
+      var td = document.createElement('td'); td.textContent = row[fi]; tr.appendChild(td);
+    }
+    var tdA = document.createElement('td'); tdA.textContent = row[4]; tr.appendChild(tdA);
+    var tdP = document.createElement('td');
+    tdP.textContent = CLASSES[predIdx] + (ok ? ' \u2713' : ' \u2717');
+    tdP.className = ok ? 'cell-correct' : 'cell-wrong';
+    tr.appendChild(tdP);
+    tbody.appendChild(tr);
+  });
+
+  var pct = (correct / IRIS_DATA.length * 100).toFixed(1);
+  document.getElementById('accuracy-summary').textContent =
+    '\u0422\u043e\u0447\u043d\u0456\u0441\u0442\u044c: ' + correct + '/150 (' + pct + '%)';
+}
+
+/* ===== Training Progress ===== */
+function updateProgress(epoch, logs) {
+  var pct = ((epoch + 1) / 150 * 100).toFixed(0);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  var acc = logs.acc !== undefined ? logs.acc : logs.accuracy;
+  var accPct = acc !== undefined ? (acc * 100).toFixed(1) : '?';
+  document.getElementById('progress-status').textContent =
+    'Епоха ' + (epoch + 1) + '/150 — втрати: ' + logs.loss.toFixed(4) + ' — точність: ' + accPct + '%';
+}
+
+/* ===== After Training ===== */
+function onTrainingComplete(model, data) {
+  document.getElementById('progress-status').textContent = 'Навчання завершено!';
+  document.getElementById('progress-bar').style.width = '100%';
+
+  ['classifier-card', 'viz-card', 'accuracy-card'].forEach(function(id) {
+    document.getElementById(id).classList.remove('hidden');
+  });
+
+  buildAccuracyTable(model, data);
+
+  // Initial classify + SVG with default slider values
+  classify(model);
+
+  document.getElementById('classify-btn').addEventListener('click', function() {
+    classify(model);
+  });
+}
+
+/* ===== Init ===== */
+buildSliders();
+
+(async function() {
+  var data = prepareData();
+  var model = buildModel();
+  await model.fit(data.xs, data.ys, {
+    epochs: 150,
+    batchSize: 32,
+    shuffle: true,
+    callbacks: { onEpochEnd: updateProgress }
+  });
+  onTrainingComplete(model, data);
+  data.xs.dispose();
+  data.ys.dispose();
+})();
+</script>
+</body>
+</html>
