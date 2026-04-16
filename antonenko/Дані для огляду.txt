@@ -1,0 +1,129 @@
+Тема курсової роботи: Психологія творчої особистості у молодшому шкільному віці (1-4 класи)
+
+Психологія творчої особистості
+молодший шкільний вік
+навчання у 1-4 класах
+молодша школа в Україні
+
+=========================
+
+https://zakon.rada.gov.ua/laws/show/4742-20#Text
+
+ЗАКОН УКРАЇНИ
+
+Про академічну доброчесність
+
+4. У разі використання в академічному творі об’єкта, згенерованого штучним інтелектом, автор повинен повідомити про це в такому творі із зазначенням методики генерування та/або посилання на відповідну комп’ютерну програму чи її опис згідно з вимогами щодо оформлення та/або оприлюднення відповідних академічних творів, визначених відповідним суб’єктом академічної діяльності.
+
+Стаття 29. Недоброчесне використання результатів, згенерованих штучним інтелектом
+
+1. Недоброчесне використання результатів, згенерованих штучним інтелектом, - це оприлюднення текстів, зображень, моделей, даних, інших результатів, згенерованих штучним інтелектом, як результатів власної академічної діяльності, якщо цей факт не зазначено в академічному творі чи супровідних матеріалах до нього.
+
+2. За недоброчесне використання результатів, згенерованих штучним інтелектом, до особи застосовуються санкції, визначені внутрішніми актами, умовами конкурсу, якщо інше не встановлено законом.
+
+=========================
+
+16.04.2026, Sonnet 4.6, extending thinking
+
+Запит: Моя мета - створення якісного огляду літератури за темою власного дослідження. Для цього я хочу використати Scopus. Запропонуй пошукові запити, які я міг би вставити у рядок пошуку Scopus.
+
+=========================
+
+## Пошукові запити для Scopus
+
+Scopus використовує англійську мову як основну, тому запити потрібно формулювати англійською. Ось набір запитів від широких до вузьких:
+
+---
+
+### 🔷 Широкі запити (для загального огляду)
+
+```
+TITLE-ABS-KEY("creative personality" AND "primary school")
+```
+```
+TITLE-ABS-KEY("creativity" AND "elementary school" AND "psychology")
+```
+```
+TITLE-ABS-KEY("creative thinking" AND "primary school age")
+```
+
+---
+
+### 🔶 Середні запити (основна тема)
+
+```
+TITLE-ABS-KEY("creative personality" AND ("children" OR "pupils") AND ("primary education" OR "grades 1-4"))
+```
+```
+TITLE-ABS-KEY(("creativity" OR "creative abilities") AND "personality" AND ("8-10 years" OR "primary school"))
+```
+```
+TITLE-ABS-KEY("development of creativity" AND "younger schoolchildren")
+```
+
+---
+
+### 🔹 Вузькі запити (специфічні аспекти)
+
+```
+TITLE-ABS-KEY("creative self-expression" AND "primary school" AND "psychological")
+```
+```
+TITLE-ABS-KEY("imagination" AND "creative personality" AND "childhood" AND "education")
+```
+```
+TITLE-ABS-KEY("divergent thinking" AND "elementary school students" AND "personality")
+```
+
+---
+
+### 💡 Практичні поради
+
+- **Фільтруй за роками:** рекомендую останні 10–15 років (2010–2025), якщо тема не вимагає класичних праць
+- **Фільтруй за типом:** `Article` та `Review` — найбільш цитовані та рецензовані джерела
+- **Додай фільтр Subject Area:** Psychology, Social Sciences, Education
+- **Оператори:** `AND` — звужує пошук, `OR` — розширює, лапки `"..."` — шукають точну фразу
+
+---
+
+> ⚠️ **Нагадування щодо академічної доброчесності:** відповідно до Закону України, якщо ти використовуватимеш будь-який ШІ-згенерований текст у курсовій роботі — це необхідно зазначити з посиланням на інструмент. Пошукові запити вище — лише інструмент для пошуку *твоїх* джерел, тож їх використання є цілком доброчесним.
+
+=========================
+
+Далі виконано пошук за кожних запитом і збережено результат у файл:
+
+TITLE-ABS-KEY("creative personality" AND "primary school") - 01.bib
+TITLE-ABS-KEY("creativity" AND "elementary school" AND "psychology") - 02.bib
+TITLE-ABS-KEY("creative thinking" AND "primary school age") - 03.bib 
+
+
+---
+
+### 🔶 Середні запити (основна тема)
+
+```
+TITLE-ABS-KEY("creative personality" AND ("children" OR "pupils") AND ("primary education" OR "grades 1-4"))
+```
+```
+TITLE-ABS-KEY(("creativity" OR "creative abilities") AND "personality" AND ("8-10 years" OR "primary school"))
+```
+```
+TITLE-ABS-KEY("development of creativity" AND "younger schoolchildren")
+```
+
+---
+
+### 🔹 Вузькі запити (специфічні аспекти)
+
+```
+TITLE-ABS-KEY("creative self-expression" AND "primary school" AND "psychological")
+```
+```
+TITLE-ABS-KEY("imagination" AND "creative personality" AND "childhood" AND "education")
+```
+```
+TITLE-ABS-KEY("divergent thinking" AND "elementary school students" AND "personality")
+
+
+
+
