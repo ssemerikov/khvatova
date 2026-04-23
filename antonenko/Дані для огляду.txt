@@ -92,37 +92,122 @@ TITLE-ABS-KEY("divergent thinking" AND "elementary school students" AND "persona
 
 Далі виконано пошук за кожних запитом і збережено результат у файл:
 
-TITLE-ABS-KEY("creative personality" AND "primary school") - 01.bib
-TITLE-ABS-KEY("creativity" AND "elementary school" AND "psychology") - 02.bib
-TITLE-ABS-KEY("creative thinking" AND "primary school age") - 03.bib 
+TITLE-ABS-KEY("creative personality" AND "primary school") - 01.bib - 3
+TITLE-ABS-KEY("creativity" AND "elementary school" AND "psychology") - 02.bib - 25
+TITLE-ABS-KEY("creative thinking" AND "primary school age") - 03.bib - 6
+TITLE-ABS-KEY("creative personality" AND ("children" OR "pupils" OR "primary education" OR "grades 1-4")) - 04.bib - 81
+TITLE-ABS-KEY(("creativity" OR "creative abilities") AND "personality" AND ("8-10 years" OR "primary school")) - 05.bib - 47
+TITLE-ABS-KEY("development of creativity" AND "schoolchildren") - 4
+TITLE-ABS-KEY("creative self-expression" AND "primary school" OR "psychological") - 29
+TITLE-ABS-KEY("imagination" AND "creative personality" AND "childhood" OR "education") - 8
+TITLE-ABS-KEY("divergent thinking" AND "elementary school students") - 09.bib - 18
 
+=========================
+
+Запит, 23.04.2026, Sonnet 4.6, extending thinking
+
+Запит: Моя мета - створення якісного огляду літератури за темою власного дослідження. Для цього був використаний Scopus. До бази знань проєкту були додані (Результати пошуку). Запропонуй за ними структуру огляду літератури.
+
+=========================
+
+## Пропонована структура огляду літератури
+
+На основі дев'яти пошукових запитів і зібраного корпусу джерел можна виокремити такі тематичні блоки:
 
 ---
 
-### 🔶 Середні запити (основна тема)
+### 1. Теоретико-методологічні засади дослідження творчої особистості
 
-```
-TITLE-ABS-KEY("creative personality" AND ("children" OR "pupils") AND ("primary education" OR "grades 1-4"))
-```
-```
-TITLE-ABS-KEY(("creativity" OR "creative abilities") AND "personality" AND ("8-10 years" OR "primary school"))
-```
-```
-TITLE-ABS-KEY("development of creativity" AND "younger schoolchildren")
-```
+Сюди увійдуть класичні та концептуальні праці — Guilford (1950), Amabile (1982), Piirto (2010), Chávez-Eakle et al. (2012). Цей розділ окреслює, як у психологічній науці визначається поняття «творча особистість», які підходи домінують і як вони еволюціонували.
 
 ---
 
-### 🔹 Вузькі запити (специфічні аспекти)
+### 2. Структура та риси творчої особистості молодшого школяра
+
+Спирається на джерела, де описуються конкретні індикатори творчої особистості у дітей 6–11 років — Tao et al. (2023), Lee (2005), Garaigordobil & Pérez (2005), Tsai (2014), Wallace (1986). Розкривається, які риси (допитливість, оригінальність, ризикованість тощо) є ключовими для цього вікового періоду.
+
+---
+
+### 3. Методи діагностики творчої особистості та творчого мислення
+
+Аналіз інструментарію: Torrance Tests of Creative Thinking (TTCT), Creative Personality Scale (CPS/EPC), classroom observation instruments. Джерела: Su et al. (2022), Krumm & Lemos (2011; 2012; 2018), Yoon (2017), Tao et al. (2023), Simner et al. (2022).
+
+---
+
+### 4. Розвиток творчого мислення та дивергентного мислення в молодшому шкільному віці
+
+Вікова динаміка і «спади» творчості, зокрема феномен «4th-grade slump». Джерела: Claxton et al. (2005), Krampen (2012), He & Wong (2015), Almazova et al. (2025), Rogers et al. (2023). Окремо — гендерні відмінності (Almazova et al., 2025; Levchin et al., 2021).
+
+---
+
+### 5. Чинники розвитку творчої особистості
+
+Цей блок найбільший і може ділитися на підрозділи:
+
+**5.1. Педагогічне середовище та роль учителя** — Chan & Yuen (2014), Al-Dababneh & Al-Zboon (2017), Sahin (2021), Bodroža et al. (2013), Kirişçi (2025), Paek et al. (2020).
+
+**5.2. Мистецька та творча діяльність** — Bayanova et al. (2025), Krumm & Lemos (2012), Sowden et al. (2015), Garaigordobil et al. (2011; 2022), Kamalova (2025).
+
+**5.3. Сімейні чинники та стилі батьківства** — Krumm et al. (2013), Lim & Smith (2008), Cho & Kim (2025), Zhang et al. (2018).
+
+**5.4. Освітнє середовище та шкільний клімат** — Gao et al. (2020), Khotinets & Shishova (2023), Hammershøj (2014).
+
+---
+
+### 6. Творча особистість і суміжні психологічні конструкти
+
+Зв'язки творчості з особистісними рисами (Big Five), самооцінкою, мотивацією, уявою. Джерела: Krumm et al. (2018), Garaigordobil (2006), Rogers et al. (2023), Gryazeva-Dobshinskaya et al. (2025), Saengpanya & Upasen (2025).
+
+---
+
+### 7. Особливі категорії дітей
+
+Обдарованість, діти з труднощами, двокультурні діти. Джерела: Chávez et al. (2009), Chomaeva et al. (2021), Huang et al. (2025), Bellieni (2025), Smees et al. (2024).
+
+---
+
+### Рекомендація щодо логіки розділів
 
 ```
-TITLE-ABS-KEY("creative self-expression" AND "primary school" AND "psychological")
+1 → Що таке творча особистість (теорія)
+2 → Як вона проявляється у молодшому шкільному віці (структура)
+3 → Як її вимірюють (методи)
+4 → Як розвивається (динаміка)
+5 → Що на неї впливає (чинники)
+6 → З чим вона пов'язана (суміжні конструкти)
+7 → Особливі випадки
 ```
-```
-TITLE-ABS-KEY("imagination" AND "creative personality" AND "childhood" AND "education")
-```
-```
-TITLE-ABS-KEY("divergent thinking" AND "elementary school students" AND "personality")
+
+=========================
+
+Запит: Моя мета - створення запиту для моделі Claude (Anthropic), результатом виконання якого стане якісний огляд літератури за темою власного дослідження. Запит має бути багатокроковим. При виконанні кожного кроку запиту користувач, який запустив запит, має отримати результати кроку та альтернативи: 1 - продовжити і перейти до наступного кроку, 2 - виправити результати поточного кроку та переробити його, 3 - повернутись до одного із попередніх кроків. Запит має працювати з базою знань проєкту:
+
+Структура огляду літератури - чітко дотримуватись
+Результати пошуку - використовувати із всіма доцільними файлами
+Доброчесність - явно відобразити використання ШІ у методиці дослідження
+Дані - тема дослідження
+
+Запит має на останньому кроці в якості результати подати текст огляду та бібліографію у форматі у LaTeX, BibTeX.
+
+Виведи структурований текст запиту, який виконує поставлену задачу.
+
+=========================
+
+Запит до Claude.md
+
+=========================
+
+Запит: Вдоскональ Запит до Claude.md, надавши більше деталей за результатами аналізу бази знань проєкту. Збільши кількість кроків із урахуванням можливих лімітів моделі Claude (Anthropic) на час та довжину відповіді. Спрямуй роботу на покращення якості, зокрема уникнення повторів, дотримання логіки дослідження, цілісності та доказовості кожного із положень.
+
+=========================
+
+
+
+
+
+
+
+
 
 
 
